@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Community Health Watch</title>
+<style>
+:root {
+  --ink-900: #0B1F26;
+  --ink-700: #12313B;
+  --ink-500: #1E4550;
+
+  --signal-normal: #3FA796;
+  --signal-watch: #E8A33D;
+  --signal-critical: #D64545;
+
+  --mist-50: #F5F8F8;
+  --mist-100: #E7EEEE;
+  --mist-200: #CFDBDB;
+
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--mist-50);
+  color: var(--ink-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.hidden { display: none !important; }
+
+.fatal-error {
+  background: #FDF2F2;
+  border: 1px solid var(--signal-critical);
+  color: var(--signal-critical);
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  font-family: var(--font-mono);
+}
+
+/* ---------- Header / nav ---------- */
+.app-header {
+  background: var(--ink-900);
+  color: var(--mist-50);
+}
+.header-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+}
+.nav-links a, .nav-links button {
+  color: var(--mist-200);
+  text-decoration: none;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.nav-links a:hover { color: var(--signal-normal); }
+.nav-links button.logout-btn:hover { color: var(--signal-critical); }
+.nav-user {
+  color: var(--mist-200);
+}
+
+/* ---------- Layout ---------- */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+.view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.header-actions { display: flex; gap: 12px; }
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+.subtitle {
+  color: var(--ink-500);
+  font-size: 14px;
+  margin: 0 0 24px 0;
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: #fff;
+  border: 1px solid var(--mist-200);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(11, 31, 38, 0.04);
+  padding: 24px;
+}
+.form-card { max-width: 480px; }
+
+/* ---------- Auth views ---------- */
+.auth-view {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+.brand-title {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+.auth-card form {
+  text-align: left;
+  margin-top: 16px;
+}
+.switch-link {
+  font-size: 14px;
+  color: var(--ink-500);
+  margin-top: 16px;
+}
+.switch-link a {
+  color: var(--ink-700);
+  font-weight: 600;
+}
+.demo-box {
+  margin-top: 20px;
+  padding: 12px 14px;
+  background: var(--mist-100);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--ink-700);
+  text-align: left;
+}
+.demo-box ul { margin: 6px 0 0 0; padding-left: 18px; }
+
+/* ---------- Forms ---------- */
+.label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-700);
+  margin: 14px 0 4px 0;
+}
+.label:first-child { margin-top: 0; }
+.input {
+  width: 100%;
+  border: 1px solid var(--mist-200);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: inherit;
+  background: #fff;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--ink-500);
+  box-shadow: 0 0 0 2px rgba(30, 69, 80, 0.15);
+}
+.hint {
+  font-size: 12px;
+  color: var(--ink-500);
+  margin: 4px 0 0 0;
+}
+.range { width: 100%; accent-color: var(--ink-700); }
+textarea.input { resize: vertical; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.symptom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.symptom-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  border: 1px solid var(--mist-200);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.symptom-option:hover { background: var(--mist-50); }
+.symptom-option.selected {
+  border-color: var(--ink-500);
+  background: var(--mist-100);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  font: inherit;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s, opacity 0.15s;
+}
+.btn-block { width: 100%; margin-top: 20px; }
+.btn-primary {
+  background: var(--ink-700);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--ink-500); }
+.btn-secondary {
+  background: #fff;
+  border-color: var(--mist-200);
+  color: var(--ink-700);
+}
+.btn-secondary:hover { background: var(--mist-100); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- Messages ---------- */
+.error-msg {
+  background: #FDF2F2;
+  border: 1px solid #F5D6D6;
+  color: var(--signal-critical);
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+/* ---------- Citizen dashboard: vitals readout ---------- */
+.records-list { display: flex; flex-direction: column; gap: 16px; }
+.record-card { padding: 20px; }
+.record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.record-date { color: var(--ink-500); }
+.record-status { font-weight: 600; }
+.status-normal { color: var(--signal-normal); }
+.status-watch { color: var(--signal-watch); }
+.status-critical { color: var(--signal-critical); }
+
+.vitals-readout {
+  font-family: var(--font-mono);
+  background: var(--ink-900);
+  color: var(--mist-50);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-size: 13px;
+}
+.record-notes {
+  font-size: 14px;
+  color: var(--ink-700);
+  margin: 12px 0 0 0;
+}
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--ink-500);
+}
+
+/* ---------- Admin dashboard ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card { padding: 20px; }
+.stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-500);
+  margin: 0 0 4px 0;
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+.stat-value.critical { color: var(--signal-critical); }
+
+.admin-panels { align-items: start; }
+.alerts-list, .area-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.alert-item {
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.alert-low { background: var(--mist-100); color: var(--ink-700); }
+.alert-medium { background: #FEF6EA; border: 1px solid #F5DFB3; color: var(--signal-watch); }
+.alert-high { background: #FDF2F2; border: 1px solid #F5D6D6; color: var(--signal-critical); }
+.alert-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+.alert-desc { font-size: 13px; margin: 4px 0 0 0; }
+.alert-time { font-size: 11px; opacity: 0.7; margin: 4px 0 0 0; }
+
+.area-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+.area-row .count { font-family: var(--font-mono); }
+.no-data { font-size: 14px; color: var(--ink-500); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .grid-2, .stats-grid { grid-template-columns: 1fr; }
+  .symptom-grid { grid-template-columns: 1fr; }
+}
+
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="max-width:600px;margin:40px auto;padding:20px;background:#FDF2F2;border:1px solid #D64545;border-radius:8px;font-family:sans-serif;color:#D64545;">
+      This app requires JavaScript to be enabled in your browser.
+    </div>
+  </noscript>
+
+
+  <!-- ============ HEADER / NAV (shown once logged in) ============ -->
+  <header id="app-header" class="app-header hidden">
+    <div class="header-inner">
+      <span class="brand">Community Health Watch</span>
+      <nav class="nav-links" id="nav-links"></nav>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- If app.js fails to load or run for any reason, this becomes visible
+         so the problem is never silent. JS removes the "hidden" class only
+         when an actual error is caught (see the window.onerror handler in app.js). -->
+    <div id="fatal-error-banner" class="fatal-error hidden"></div>
+
+
+    <!-- ============ LOGIN VIEW ============ -->
+    <section id="view-login" class="view auth-view">
+      <div class="auth-card card">
+        <h1 class="brand-title">Community Health Watch</h1>
+        <p class="subtitle">Sign in to check in and stay informed.</p>
+
+        <p id="login-error" class="error-msg hidden"></p>
+
+        <form id="login-form">
+          <label class="label" for="login-email">Email</label>
+          <input class="input" type="email" id="login-email" required />
+
+          <label class="label" for="login-password">Password</label>
+          <input class="input" type="password" id="login-password" required />
+
+          <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+        </form>
+
+        <p class="switch-link">
+          New here? <a href="#" data-goto="register">Create an account</a>
+        </p>
+
+        <div class="demo-box">
+          <strong>Demo accounts</strong> (password: <code>Password123!</code>)
+          <ul>
+            <li>admin@example.com &mdash; Admin</li>
+            <li>officer@example.com &mdash; Officer (WARD-12)</li>
+            <li>citizen@example.com &mdash; Citizen (WARD-12)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ REGISTER VIEW ============ -->
+    <section id="view-register" class="view auth-view hidden">
+      <div class="auth-card card">
+        <h1 class="brand-title">Create your account</h1>
+        <p class="subtitle">Join your community's health watch.</p>
+
+        <p id="register-error" class="error-msg hidden"></p>
+
+        <form id="register-form">
+          <label class="label" for="reg-name">Full name</label>
+          <input class="input" type="text" id="reg-name" required />
+
+          <label class="label" for="reg-email">Email</label>
+          <input class="input" type="email" id="reg-email" required />
+
+          <label class="label" for="reg-password">Password</label>
+          <input class="input" type="password" id="reg-password" minlength="8" required />
+          <p class="hint">At least 8 characters.</p>
+
+          <label class="label" for="reg-area">Neighborhood / area code</label>
+          <input class="input" type="text" id="reg-area" placeholder="e.g. WARD-12" />
+          <p class="hint">Used to group community health trends.</p>
+
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        </form>
+
+        <p class="switch-link">
+          Already have an account? <a href="#" data-goto="login">Sign in</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ CITIZEN DASHBOARD ============ -->
+    <section id="view-citizen-dashboard" class="view hidden">
+      <div class="view-header">
+        <h1 id="citizen-welcome">Welcome back</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" data-goto="symptoms">Report symptoms</button>
+          <button class="btn btn-primary" data-goto="checkin">Daily check-in</button>
+        </div>
+      </div>
+      <div id="citizen-records" class="records-list"></div>
+    </section>
+
+    <!-- ============ DAILY CHECK-IN FORM ============ -->
+    <section id="view-checkin" class="view hidden">
+      <h1>Daily health check-in</h1>
+      <p class="subtitle">Log today's vitals. Takes about 30 seconds.</p>
+
+      <form id="checkin-form" class="card form-card">
+        <p id="checkin-error" class="error-msg hidden"></p>
+
+        <div class="grid-2">
+          <div>
+            <label class="label" for="ci-temp">Temperature (&deg;C)</label>
+            <input class="input" type="number" step="0.1" id="ci-temp" required />
+          </div>
+          <div>
+            <label class="label" for="ci-hr">Heart rate (bpm)</label>
+            <input class="input" type="number" id="ci-hr" required />
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <label class="label" for="ci-sys">Systolic BP (optional)</label>
+            <input class="input" type="number" id="ci-sys" />
+          </div>
+          <div>
+            <label class="label" for="ci-dia">Diastolic BP (optional)</label>
+            <input class="input" type="number" id="ci-dia" />
+          </div>
+        </div>
+
+        <label class="label" for="ci-spo2">SpO2 % (optional)</label>
+        <input class="input" type="number" id="ci-spo2" />
+
+        <label class="label" for="ci-notes">Notes (optional)</label>
+        <textarea class="input" id="ci-notes" rows="3"></textarea>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit check-in</button>
+      </form>
+    </section>
+
+    <!-- ============ SYMPTOM REPORT FORM ============ -->
+    <section id="view-symptoms" class="view hidden">
+      <h1>Report symptoms</h1>
+      <p class="subtitle">Helps your community's health officers spot emerging patterns early.</p>
+
+      <form id="symptoms-form" class="card form-card">
+        <p id="symptoms-error" class="error-msg hidden"></p>
+
+        <span class="label">Symptoms</span>
+        <div id="symptom-options" class="symptom-grid"></div>
+
+        <label class="label" for="sym-severity">Severity: <span id="severity-value">2</span> / 5</label>
+        <input class="range" type="range" id="sym-severity" min="1" max="5" value="2" />
+
+        <label class="label" for="sym-notes">Additional notes (optional)</label>
+        <textarea class="input" id="sym-notes" rows="3"></textarea>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit report</button>
+      </form>
+    </section>
+
+    <!-- ============ ADMIN / OFFICER DASHBOARD ============ -->
+    <section id="view-admin-dashboard" class="view hidden">
+      <h1>Community overview</h1>
+
+      <div class="stats-grid">
+        <div class="card stat-card">
+          <p class="stat-label">Total residents</p>
+          <p class="stat-value" id="stat-total-users">0</p>
+        </div>
+        <div class="card stat-card">
+          <p class="stat-label">Check-ins today</p>
+          <p class="stat-value" id="stat-checkins-today">0</p>
+        </div>
+        <div class="card stat-card">
+          <p class="stat-label">Symptom reports today</p>
+          <p class="stat-value" id="stat-symptoms-today">0</p>
+        </div>
+        <div class="card stat-card">
+          <p class="stat-label">Critical readings today</p>
+          <p class="stat-value" id="stat-critical-today">0</p>
+        </div>
+      </div>
+
+      <div class="grid-2 admin-panels">
+        <section class="card">
+          <h2>Open alerts</h2>
+          <ul id="alerts-list" class="alerts-list"></ul>
+        </section>
+
+        <section class="card">
+          <h2>Today's reports by area</h2>
+          <ul id="area-breakdown-list" class="area-list"></ul>
+        </section>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+/* =====================================================================
+   Community Health Watch — client-only demo build (HTML/CSS/JS)
+
+   IMPORTANT: This version has no real server or database. All data
+   (users, check-ins, symptom reports, alerts) lives in plain JS
+   variables in memory, so everything resets on page refresh and is
+   only visible in this one browser tab. It's meant to demo the Phase 1
+   UX and business logic end-to-end without any backend setup.
+
+   For real multi-user use with persistence, passwords that are
+   actually hashed, and data survives a refresh, you need a server +
+   database — see the earlier Next.js/Prisma version of this project.
+   ===================================================================== */
+
+// Surface any unexpected error directly on the page. If you ever see this
+// banner, please copy its exact text — that pinpoints the real problem
+// immediately, rather than the app just silently appearing "broken."
+window.addEventListener("error", function (event) {
+  const banner = document.getElementById("fatal-error-banner");
+  if (!banner) return;
+  banner.textContent =
+    "A script error occurred: " + event.message +
+    (event.filename ? " (" + event.filename + ":" + event.lineno + ")" : "");
+  banner.classList.remove("hidden");
+});
+
+// ---------------------------------------------------------------------
+// In-memory "database"
+// ---------------------------------------------------------------------
+const db = {
+  users: [],          // { id, name, email, password, role, areaCode }
+  healthRecords: [],   // { id, userId, temperatureC, heartRateBpm, systolicBp, diastolicBp, spo2Percent, notes, healthScore, createdAt }
+  symptomReports: [],  // { id, userId, symptoms[], severity, notes, areaCode, createdAt }
+  alerts: [],          // { id, areaCode, title, description, severity, status, triggerType, createdAt }
+};
+
+let nextId = 1;
+function makeId() {
+  return "id_" + nextId++;
+}
+
+// ---------------------------------------------------------------------
+// Seed demo data (mirrors the backend version's seed script)
+// ---------------------------------------------------------------------
+function seedDemoData() {
+  const admin = {
+    id: makeId(), name: "Ada Admin", email: "admin@example.com",
+    password: "Password123!", role: "ADMIN", areaCode: null,
+  };
+  const officer = {
+    id: makeId(), name: "Oscar Officer", email: "officer@example.com",
+    password: "Password123!", role: "OFFICER", areaCode: "WARD-12",
+  };
+  const citizen = {
+    id: makeId(), name: "Cara Citizen", email: "citizen@example.com",
+    password: "Password123!", role: "CITIZEN", areaCode: "WARD-12",
+  };
+  db.users.push(admin, officer, citizen);
+
+  addHealthRecord(citizen.id, {
+    temperatureC: 36.8, heartRateBpm: 72, systolicBp: 118, diastolicBp: 76, spo2Percent: 98,
+  });
+  addSymptomReport(citizen.id, { symptoms: ["cough", "fatigue"], severity: 2 });
+}
+
+// ---------------------------------------------------------------------
+// Core domain logic (ported 1:1 from the backend's lib/health-logic.js)
+// ---------------------------------------------------------------------
+function calculateHealthScore({ temperatureC, heartRateBpm, systolicBp, diastolicBp, spo2Percent }) {
+  let score = 100;
+
+  if (temperatureC >= 38.0) score -= 30;
+  else if (temperatureC >= 37.3) score -= 15;
+  else if (temperatureC < 35.5) score -= 20;
+
+  if (heartRateBpm > 120 || heartRateBpm < 40) score -= 25;
+  else if (heartRateBpm > 100 || heartRateBpm < 50) score -= 10;
+
+  if (systolicBp != null && diastolicBp != null) {
+    if (systolicBp >= 180 || diastolicBp >= 120) score -= 25;
+    else if (systolicBp >= 140 || diastolicBp >= 90) score -= 10;
+    else if (systolicBp < 90 || diastolicBp < 60) score -= 10;
+  }
+
+  if (spo2Percent != null) {
+    if (spo2Percent < 90) score -= 30;
+    else if (spo2Percent < 95) score -= 15;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function classifyHealthRecord(score) {
+  if (score >= 80) return "NORMAL";
+  if (score >= 60) return "WATCH";
+  return "CRITICAL";
+}
+
+const ALERT_WINDOW_HOURS = 24;
+
+function evaluateAreaAlert({ areaCode, totalReports, feverCount, lowSpo2Count, avgSeverity }) {
+  if (totalReports === 0) return { trigger: false };
+
+  const feverRate = feverCount / totalReports;
+
+  if (lowSpo2Count >= 3) {
+    return {
+      trigger: true, triggerType: "LOW_SPO2_CLUSTER", severity: "HIGH",
+      title: `Low oxygen saturation cluster in ${areaCode}`,
+      description: `${lowSpo2Count} residents in ${areaCode} reported SpO2 below 95% recently. Recommend priority follow-up.`,
+    };
+  }
+
+  if (feverCount >= 5 && feverRate >= 0.3) {
+    return {
+      trigger: true, triggerType: "FEVER_CLUSTER",
+      severity: feverRate >= 0.5 ? "HIGH" : "MEDIUM",
+      title: `Fever cluster detected in ${areaCode}`,
+      description: `${feverCount} of ${totalReports} recent reports in ${areaCode} include fever (${Math.round(feverRate * 100)}%).`,
+    };
+  }
+
+  if (avgSeverity >= 3.5 && totalReports >= 5) {
+    return {
+      trigger: true, triggerType: "SYMPTOM_SEVERITY_SPIKE", severity: "MEDIUM",
+      title: `Elevated symptom severity in ${areaCode}`,
+      description: `Average self-reported severity in ${areaCode} is ${avgSeverity.toFixed(1)}/5 across ${totalReports} reports.`,
+    };
+  }
+
+  return { trigger: false };
+}
+
+// ---------------------------------------------------------------------
+// Data-layer helpers (stand in for the API routes)
+// ---------------------------------------------------------------------
+function findUserByEmail(email) {
+  return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase().trim());
+}
+
+function registerUser({ name, email, password, areaCode }) {
+  if (findUserByEmail(email)) {
+    throw new Error("An account with this email already exists");
+  }
+  const user = {
+    id: makeId(),
+    name: name.trim(),
+    email: email.toLowerCase().trim(),
+    password, // NOTE: plaintext, demo only — a real backend must hash this (see lib/auth.js in the Next.js version)
+    role: "CITIZEN",
+    areaCode: areaCode ? areaCode.trim() : null,
+  };
+  db.users.push(user);
+  return user;
+}
+
+function loginUser({ email, password }) {
+  const user = findUserByEmail(email);
+  if (!user || user.password !== password) {
+    throw new Error("Invalid email or password");
+  }
+  return user;
+}
+
+function addHealthRecord(userId, data) {
+  const healthScore = calculateHealthScore(data);
+  const record = {
+    id: makeId(),
+    userId,
+    temperatureC: data.temperatureC,
+    heartRateBpm: data.heartRateBpm,
+    systolicBp: data.systolicBp ?? null,
+    diastolicBp: data.diastolicBp ?? null,
+    spo2Percent: data.spo2Percent ?? null,
+    notes: data.notes || null,
+    healthScore,
+    createdAt: new Date(),
+  };
+  db.healthRecords.push(record);
+  return record;
+}
+
+function addSymptomReport(userId, data) {
+  const user = db.users.find((u) => u.id === userId);
+  const report = {
+    id: makeId(),
+    userId,
+    symptoms: data.symptoms,
+    severity: data.severity,
+    notes: data.notes || null,
+    areaCode: user ? user.areaCode : null,
+    createdAt: new Date(),
+  };
+  db.symptomReports.push(report);
+
+  if (report.areaCode) evaluateAndRaiseAreaAlert(report.areaCode);
+  return report;
+}
+
+function evaluateAndRaiseAreaAlert(areaCode) {
+  const since = new Date(Date.now() - ALERT_WINDOW_HOURS * 60 * 60 * 1000);
+
+  const recentReports = db.symptomReports.filter((r) => r.areaCode === areaCode && r.createdAt >= since);
+  const totalReports = recentReports.length;
+  const feverCount = recentReports.filter((r) => r.symptoms.includes("fever")).length;
+  const avgSeverity = totalReports > 0
+    ? recentReports.reduce((sum, r) => sum + r.severity, 0) / totalReports
+    : 0;
+
+  const lowSpo2Count = db.healthRecords.filter((r) => {
+    if (r.createdAt < since || r.spo2Percent == null || r.spo2Percent >= 95) return false;
+    const owner = db.users.find((u) => u.id === r.userId);
+    return owner && owner.areaCode === areaCode;
+  }).length;
+
+  const result = evaluateAreaAlert({ areaCode, totalReports, feverCount, lowSpo2Count, avgSeverity });
+  if (!result.trigger) return;
+
+  const existingOpen = db.alerts.find(
+    (a) => a.areaCode === areaCode && a.triggerType === result.triggerType && a.status === "OPEN"
+  );
+  if (existingOpen) return;
+
+  db.alerts.push({
+    id: makeId(),
+    areaCode,
+    title: result.title,
+    description: result.description,
+    severity: result.severity,
+    status: "OPEN",
+    triggerType: result.triggerType,
+    createdAt: new Date(),
+  });
+}
+
+function getDashboardStats() {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const totalUsers = db.users.filter((u) => u.role === "CITIZEN").length;
+  const healthRecordsToday = db.healthRecords.filter((r) => r.createdAt >= startOfToday).length;
+  const symptomReportsToday = db.symptomReports.filter((r) => r.createdAt >= startOfToday).length;
+  const criticalRecordsToday = db.healthRecords.filter(
+    (r) => r.createdAt >= startOfToday && r.healthScore < 60
+  ).length;
+  const openAlerts = db.alerts
+    .filter((a) => a.status === "OPEN")
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 20);
+
+  const areaCounts = {};
+  db.symptomReports
+    .filter((r) => r.createdAt >= startOfToday && r.areaCode)
+    .forEach((r) => { areaCounts[r.areaCode] = (areaCounts[r.areaCode] || 0) + 1; });
+  const areaBreakdown = Object.entries(areaCounts)
+    .map(([areaCode, reportCount]) => ({ areaCode, reportCount }))
+    .sort((a, b) => b.reportCount - a.reportCount)
+    .slice(0, 10);
+
+  return { totalUsers, healthRecordsToday, symptomReportsToday, criticalRecordsToday, openAlerts, areaBreakdown };
+}
+
+// ---------------------------------------------------------------------
+// Session (in-memory only — logging out or refreshing clears it)
+// ---------------------------------------------------------------------
+let currentUser = null;
+
+// ---------------------------------------------------------------------
+// View routing
+// ---------------------------------------------------------------------
+const VIEWS = [
+  "login", "register", "citizen-dashboard", "checkin", "symptoms", "admin-dashboard",
+];
+
+function showView(name) {
+  VIEWS.forEach((v) => {
+    document.getElementById(`view-${v}`).classList.toggle("hidden", v !== name);
+  });
+
+  const header = document.getElementById("app-header");
+  const isAuthView = name === "login" || name === "register";
+  header.classList.toggle("hidden", isAuthView);
+
+  if (name === "citizen-dashboard") renderCitizenDashboard();
+  if (name === "admin-dashboard") renderAdminDashboard();
+  if (name === "symptoms") renderSymptomOptions();
+}
+
+function renderNav() {
+  const nav = document.getElementById("nav-links");
+  nav.innerHTML = "";
+
+  const links = currentUser.role === "CITIZEN"
+    ? [
+        { label: "Dashboard", view: "citizen-dashboard" },
+        { label: "Daily check-in", view: "checkin" },
+        { label: "Report symptoms", view: "symptoms" },
+      ]
+    : [{ label: "Dashboard", view: "admin-dashboard" }];
+
+  links.forEach((link) => {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = link.label;
+    a.addEventListener("click", (e) => { e.preventDefault(); showView(link.view); });
+    nav.appendChild(a);
+  });
+
+  const userLabel = document.createElement("span");
+  userLabel.className = "nav-user";
+  userLabel.textContent = currentUser.name;
+  nav.appendChild(userLabel);
+
+  const logoutBtn = document.createElement("button");
+  logoutBtn.className = "logout-btn";
+  logoutBtn.textContent = "Sign out";
+  logoutBtn.addEventListener("click", handleLogout);
+  nav.appendChild(logoutBtn);
+}
+
+function goToPostLoginView() {
+  renderNav();
+  showView(currentUser.role === "CITIZEN" ? "citizen-dashboard" : "admin-dashboard");
+}
+
+function handleLogout() {
+  currentUser = null;
+  document.getElementById("login-form").reset();
+  showView("login");
+}
+
+// ---------------------------------------------------------------------
+// Rendering: Citizen dashboard
+// ---------------------------------------------------------------------
+function renderCitizenDashboard() {
+  document.getElementById("citizen-welcome").textContent =
+    `Welcome back, ${currentUser.name.split(" ")[0]}`;
+
+  const container = document.getElementById("citizen-records");
+  const records = db.healthRecords
+    .filter((r) => r.userId === currentUser.id)
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 10);
+
+  if (records.length === 0) {
+    container.innerHTML = `
+      <div class="card empty-state">
+        <p>No check-ins yet. Your first entry starts your health record.</p>
+        <button class="btn btn-primary" id="first-checkin-btn" style="margin-top:12px;">Submit your first check-in</button>
+      </div>`;
+    document.getElementById("first-checkin-btn").addEventListener("click", () => showView("checkin"));
+    return;
+  }
+
+  container.innerHTML = records.map((r) => {
+    const status = classifyHealthRecord(r.healthScore);
+    const statusClass = { NORMAL: "status-normal", WATCH: "status-watch", CRITICAL: "status-critical" }[status];
+    return `
+      <div class="card record-card">
+        <div class="record-top">
+          <span class="record-date">${r.createdAt.toLocaleString()}</span>
+          <span class="record-status ${statusClass}">${status} &middot; score ${r.healthScore}</span>
+        </div>
+        <div class="vitals-readout">
+          <span>TEMP ${r.temperatureC.toFixed(1)}&deg;C</span>
+          <span>HR ${r.heartRateBpm} bpm</span>
+          ${r.systolicBp && r.diastolicBp ? `<span>BP ${r.systolicBp}/${r.diastolicBp}</span>` : ""}
+          ${r.spo2Percent ? `<span>SpO2 ${r.spo2Percent}%</span>` : ""}
+        </div>
+        ${r.notes ? `<p class="record-notes">${escapeHtml(r.notes)}</p>` : ""}
+      </div>`;
+  }).join("");
+}
+
+// ---------------------------------------------------------------------
+// Rendering: Admin dashboard
+// ---------------------------------------------------------------------
+function renderAdminDashboard() {
+  const stats = getDashboardStats();
+
+  document.getElementById("stat-total-users").textContent = stats.totalUsers;
+  document.getElementById("stat-checkins-today").textContent = stats.healthRecordsToday;
+  document.getElementById("stat-symptoms-today").textContent = stats.symptomReportsToday;
+
+  const criticalEl = document.getElementById("stat-critical-today");
+  criticalEl.textContent = stats.criticalRecordsToday;
+  criticalEl.classList.toggle("critical", stats.criticalRecordsToday > 0);
+
+  const alertsList = document.getElementById("alerts-list");
+  alertsList.innerHTML = stats.openAlerts.length === 0
+    ? `<li class="no-data">No active alerts. All clear.</li>`
+    : stats.openAlerts.map((alert) => `
+        <li class="alert-item alert-${alert.severity.toLowerCase()}">
+          <div class="alert-top">
+            <span>${escapeHtml(alert.title)}</span>
+            <span>${alert.severity}</span>
+          </div>
+          <p class="alert-desc">${escapeHtml(alert.description)}</p>
+          <p class="alert-time">${alert.createdAt.toLocaleString()}</p>
+        </li>`).join("");
+
+  const areaList = document.getElementById("area-breakdown-list");
+  areaList.innerHTML = stats.areaBreakdown.length === 0
+    ? `<li class="no-data">No symptom reports yet today.</li>`
+    : stats.areaBreakdown.map((row) => `
+        <li class="area-row">
+          <span>${escapeHtml(row.areaCode)}</span>
+          <span class="count">${row.reportCount}</span>
+        </li>`).join("");
+}
+
+// ---------------------------------------------------------------------
+// Symptom options (checkbox grid)
+// ---------------------------------------------------------------------
+const SYMPTOM_OPTIONS = [
+  { value: "fever", label: "Fever" },
+  { value: "cough", label: "Cough" },
+  { value: "sore_throat", label: "Sore throat" },
+  { value: "shortness_of_breath", label: "Shortness of breath" },
+  { value: "fatigue", label: "Fatigue" },
+  { value: "headache", label: "Headache" },
+  { value: "nausea", label: "Nausea" },
+  { value: "diarrhea", label: "Diarrhea" },
+  { value: "loss_of_taste_smell", label: "Loss of taste/smell" },
+  { value: "body_ache", label: "Body ache" },
+];
+let selectedSymptoms = [];
+
+function renderSymptomOptions() {
+  selectedSymptoms = [];
+  const container = document.getElementById("symptom-options");
+  container.innerHTML = SYMPTOM_OPTIONS.map((opt) => `
+    <label class="symptom-option" data-value="${opt.value}">
+      <input type="checkbox" value="${opt.value}" />
+      ${opt.label}
+    </label>`).join("");
+
+  container.querySelectorAll(".symptom-option").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const value = el.dataset.value;
+      const checkbox = el.querySelector("input");
+      const isSelected = selectedSymptoms.includes(value);
+      if (isSelected) {
+        selectedSymptoms = selectedSymptoms.filter((v) => v !== value);
+      } else {
+        selectedSymptoms.push(value);
+      }
+      checkbox.checked = !isSelected;
+      el.classList.toggle("selected", !isSelected);
+    });
+  });
+
+  document.getElementById("sym-severity").value = 2;
+  document.getElementById("severity-value").textContent = "2";
+  document.getElementById("sym-notes").value = "";
+  document.getElementById("symptoms-error").classList.add("hidden");
+}
+
+// ---------------------------------------------------------------------
+// Small helpers
+// ---------------------------------------------------------------------
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showError(elementId, message) {
+  const el = document.getElementById(elementId);
+  el.textContent = message;
+  el.classList.remove("hidden");
+}
+
+function hideError(elementId) {
+  document.getElementById(elementId).classList.add("hidden");
+}
+
+// ---------------------------------------------------------------------
+// Event wiring
+// ---------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+  seedDemoData();
+
+  // Login / register switch links
+  document.querySelectorAll("[data-goto]").forEach((el) => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      showView(el.dataset.goto);
+    });
+  });
+
+  // Login form
+  document.getElementById("login-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    hideError("login-error");
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    try {
+      currentUser = loginUser({ email, password });
+      e.target.reset();
+      goToPostLoginView();
+    } catch (err) {
+      showError("login-error", err.message);
+    }
+  });
+
+  // Register form
+  document.getElementById("register-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    hideError("register-error");
+    const name = document.getElementById("reg-name").value;
+    const email = document.getElementById("reg-email").value;
+    const password = document.getElementById("reg-password").value;
+    const areaCode = document.getElementById("reg-area").value;
+    try {
+      currentUser = registerUser({ name, email, password, areaCode });
+      e.target.reset();
+      goToPostLoginView();
+    } catch (err) {
+      showError("register-error", err.message);
+    }
+  });
+
+  // Check-in form
+  document.getElementById("checkin-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    hideError("checkin-error");
+    const temperatureC = parseFloat(document.getElementById("ci-temp").value);
+    const heartRateBpm = parseInt(document.getElementById("ci-hr").value, 10);
+    const sys = document.getElementById("ci-sys").value;
+    const dia = document.getElementById("ci-dia").value;
+    const spo2 = document.getElementById("ci-spo2").value;
+    const notes = document.getElementById("ci-notes").value;
+
+    if (Number.isNaN(temperatureC) || Number.isNaN(heartRateBpm)) {
+      showError("checkin-error", "Temperature and heart rate are required.");
+      return;
+    }
+
+    addHealthRecord(currentUser.id, {
+      temperatureC,
+      heartRateBpm,
+      systolicBp: sys ? parseInt(sys, 10) : null,
+      diastolicBp: dia ? parseInt(dia, 10) : null,
+      spo2Percent: spo2 ? parseInt(spo2, 10) : null,
+      notes,
+    });
+
+    e.target.reset();
+    showView("citizen-dashboard");
+  });
+
+  // Symptom severity slider live value
+  document.getElementById("sym-severity").addEventListener("input", (e) => {
+    document.getElementById("severity-value").textContent = e.target.value;
+  });
+
+  // Symptoms form
+  document.getElementById("symptoms-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    hideError("symptoms-error");
+    if (selectedSymptoms.length === 0) {
+      showError("symptoms-error", "Select at least one symptom.");
+      return;
+    }
+    const severity = parseInt(document.getElementById("sym-severity").value, 10);
+    const notes = document.getElementById("sym-notes").value;
+
+    addSymptomReport(currentUser.id, { symptoms: [...selectedSymptoms], severity, notes });
+
+    e.target.reset();
+    showView("citizen-dashboard");
+  });
+
+  showView("login");
+});
+
+  </script>
+</body>
+</html>
